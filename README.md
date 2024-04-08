@@ -6,9 +6,11 @@
 > This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version _17.3.3._
 > Updated to Angular **17.3.3.**
 
-## Requisitos para el laboratorio
+## 1. Requisitos para el laboratorio
 
 Comprobar [versión de Node.js](https://angular.io/guide/versions) y npm.
+
+Instalar **Angular CLI**para generar aplicación de ejemplo.
 
 ```bash
 # Check Node.js and npm versions
@@ -21,31 +23,33 @@ npm i -g @angular/cli@latest
 > [!NOTE]
 > La aplicación de ejemplo estará en la carpeta [ActivityBookings](./ActivityBookings)
 
-## Iniciar a partir del laboratorio
-
-El código fuente de la aplicación de ejemplo se encuentra en el repositorio de GitHub [softtek_angular_basics](https://github.com/TrainingITCourses/softtek_angular_update_1).
+## 2. Generar aplicación de ejemplo
 
 ```bash
 # Clone lab from github
-git clone https://github.com/TrainingITCourses/softtek_angular_basics.git
+git clone https://github.com/TrainingITCourses/softtek_angular_update_1.git
 # Install and run
-cd softtek_angular_basics/ActivityBookings
+cd softtek_angular_update_1/ActivityBookings
+# Generate new Angular project
+ng new ActivityBookings --inline-style --inline-template --prefix=lab --ssr --style=css
+# Or run with npx and options with aliases (- instead of --)
+npx ng new ActivityBookings -s -t -p=lab --ssr --style=css
+```
+
+### Replicar a partir del laboratorio ya en marcha
+
+El código fuente de la aplicación de ejemplo se encuentra en el repositorio de GitHub [softtek_angular_update_1](https://github.com/TrainingITCourses/softtek_angular_update_1).
+
+```bash
+# Clone lab from github
+git clone https://github.com/TrainingITCourses/softtek_angular_update_1.git
+# Install and run
+cd softtek_angular_update_1/ActivityBookings
 npm install
 # Start Angular server
 npm start
 # Run a fake API server
 npm run api:seed
-```
-
-## Replicar desde cero
-
-Instalar **Angular CLI** y generar aplicación de ejemplo.
-
-```bash
-# Generate new Angular project
-ng new ActivityBookings --inline-style --inline-template --prefix=lab --ssr --style=css
-# Or run with npx and options with aliases (- instead of --)
-npx ng new ActivityBookings -s -t -p=lab --ssr --style=css
 ```
 
 ---
