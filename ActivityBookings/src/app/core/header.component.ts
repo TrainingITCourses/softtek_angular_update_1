@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { AuthService } from './auth.service';
+import { AuthService } from '../shared/auth.service';
 
 @Component({
   selector: 'lab-header',
@@ -7,12 +7,18 @@ import { AuthService } from './auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
   template: `
-    <nav>
-      <ul>
-        <li>🏠 {{ title }}</li>
-        <li>👤 {{ user }}</li>
-      </ul>
-    </nav>
+    <header>
+      <nav>
+        <ul>
+          <li>
+            🏠 <a href="">{{ title }}</a>
+          </li>
+          <li>
+            👤 <a href="">{{ user }}</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
   `,
 })
 export class HeaderComponent {
