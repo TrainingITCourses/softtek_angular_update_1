@@ -1,9 +1,10 @@
 import { UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { AuthService } from '../shared/auth.service';
 
 // class FakeAuthService {
-//   user = 'fake';
+//   user = 'fake!!!';
 // }
 // providers:[{provide: AuthService, useClass: FakeAuthService}]
 
@@ -12,6 +13,7 @@ import { AuthService } from '../shared/auth.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [UpperCasePipe],
+  //providers: [{ provide: AuthService, useClass: FakeAuthService }],
   template: `
     <header>
       <nav>
@@ -29,6 +31,6 @@ import { AuthService } from '../shared/auth.service';
 })
 export class HeaderComponent {
   #authService: AuthService = inject(AuthService);
-  title: string = 'Activity Bookings';
+  title: string = environment.appName;
   user: string = this.#authService.user;
 }
