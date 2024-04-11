@@ -7,39 +7,33 @@ import {
   effect,
   signal,
 } from '@angular/core';
-import { CookiesComponent, CookiesStatus } from './cookies.component';
-
-type UserStatus = {
-  cookies: CookiesStatus;
-  isAnonymous: boolean;
-  credit: number;
-};
+import { CookiesComponent } from './cookies.component';
+import { CookiesStatus, UserStatus } from './user-status.type';
+import { UserComponent } from './user.component';
 
 @Component({
   selector: 'lab-footer',
   standalone: true,
-  imports: [CookiesComponent],
+  imports: [CookiesComponent, UserComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <footer>
-      <h1>Smart Parent TTL: {{ ttl() }}</h1>
       <nav>
         <span> {{ getYear() }}</span>
-        <lab-cookies
-          [areCookiesPending]="areCookiesPending()"
-          [cookiesStatus]="cookiesStatus()"
-          [(ttl)]="ttl"
-          (cancel)="onUpdate('rejected')" />
+        <span>
+          <lab-user [user]="user()" (click)="openDialog.set(true)" />
+          <lab-cookies
+            [(openDialog)]="openDialog"
+            (accept)="onCookiesUpdate($event)"
+            (cancel)="onCookiesUpdate('rejected')" />
+        </span>
       </nav>
     </footer>
   `,
-  styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterWidget {
   #saveCookiesStatus = effect(() => {
     console.log('saving cookies status', this.cookiesStatus());
-    console.log('saving ttl', this.ttl());
-    // localStorage.setItem('Cookies', JSON.stringify(this.cookiesStatus()));
   });
 
   getYear() {
@@ -52,15 +46,21 @@ export class FooterWidget {
     credit: 0,
   });
 
-  ttl: WritableSignal<number> = signal(42);
+  openDialog: WritableSignal<boolean> = signal(true);
 
+  user = computed(() => {
+    let result = '';
+    result += this.userStatus().isAnonymous ? '👤' : '🙂';
+    result += this.userStatus().cookies === 'rejected' ? '🚫' : '💚';
+    return result;
+  });
   cookiesStatus: Signal<CookiesStatus> = computed(() => this.userStatus().cookies);
   areCookiesPending: Signal<boolean> = computed(() => this.cookiesStatus() === 'pending');
 
-  onUpdate(newStatus: CookiesStatus) {
-    this.userStatus.update((x) => {
-      const y = { ...x, cookies: newStatus };
-      return y;
+  onCookiesUpdate(newStatus: CookiesStatus) {
+    this.userStatus.update((state) => {
+      const newState = { ...state, cookies: newStatus };
+      return newState;
     });
   }
 }

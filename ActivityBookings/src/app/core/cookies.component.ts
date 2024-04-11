@@ -1,54 +1,48 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  InputSignal,
   ModelSignal,
   OutputEmitterRef,
-  input,
   model,
   output,
 } from '@angular/core';
 
-export type CookiesStatus = 'pending' | 'rejected' | 'essentials' | 'all';
 export type Acceptance = 'essentials' | 'all';
 
 @Component({
   selector: 'lab-cookies',
   standalone: true,
-  imports: [],
-  template: `
-    <span> Cookies status: {{ cookiesStatus() }}</span>
-    <span>
-      @if (areCookiesPending()) {
-        <button (click)="onUpdate('all')">Accept cookies</button>
-        <button (click)="onUpdate('rejected')">Reject cookies</button>
-        <button (click)="onUpdate('all')">Accept All cookies</button>
-        <button (click)="onUpdate('pending')">Remain pending cookies</button>
-      }
-    </span>
-    <div>
-      <button (click)="ttl.set(1)">1 day</button>
-      <button (click)="ttl.set(365)">1 year</button>
-      <p>Dumb Child {{ ttl() }}</p>
-    </div>
-  `,
-  styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <dialog [open]="openDialog()">
+      <article>
+        <header>
+          <h2>We use cookies</h2>
+          <p>To ensure you get the best experience on our website.</p>
+        </header>
+        <section>
+          <p>To be compliant with the EU GDPR law, we need your consent to set the cookies.</p>
+        </section>
+        <footer>
+          <button class="contrast outline" (click)="onButtonsClick()">Cancel</button>
+          <button class="secondary outline" (click)="onButtonsClick('essentials')">
+            Essentials
+          </button>
+          <button class="primary outline" (click)="onButtonsClick('all')">Accept all</button>
+        </footer>
+      </article>
+    </dialog>
+  `,
 })
 export class CookiesComponent {
-  cookiesStatus: InputSignal<CookiesStatus> = input.required<CookiesStatus>();
-  areCookiesPending: InputSignal<boolean> = input(true);
   cancel: OutputEmitterRef<void> = output();
   accept: OutputEmitterRef<Acceptance> = output<Acceptance>();
 
-  ttl: ModelSignal<number> = model(1);
+  openDialog: ModelSignal<boolean> = model(false);
 
-  onUpdate(newStatus: CookiesStatus) {
-    console.log('updating cookies status', newStatus);
-    if (newStatus === 'all' || newStatus === 'essentials') {
-      this.accept.emit(newStatus);
-    } else {
-      this.cancel.emit();
-    }
+  onButtonsClick(acceptance?: Acceptance) {
+    this.openDialog.set(false);
+    if (acceptance) this.accept.emit(acceptance);
+    else this.cancel.emit();
   }
 }
