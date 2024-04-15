@@ -14,15 +14,14 @@ import { UserStatus } from './user-status.type';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span>🍪 {{ cookies() }}</span>
-    <span>👤 {{ auth() }}</span>
-    <span>💲 {{ user().credit }}</span>
+    <span>💲 {{ moons() }}</span>
   `,
 })
 export class UserComponent {
   /** Input required signal */
   user: InputSignal<UserStatus> = input.required<UserStatus>();
 
-  /** Compute over input signals */
+  /** Compute over input signals for presentation*/
 
   cookies: Signal<string> = computed(() => {
     const cookies = this.user().cookies;
@@ -37,5 +36,13 @@ export class UserComponent {
         return '❔';
     }
   });
-  auth: Signal<string> = computed(() => (this.user().isAnonymous ? '🔒' : '🔓'));
+
+  moons = computed(() => {
+    const credits = this.user().credit;
+    if (credits > 9) return '🌕';
+    if (credits > 6) return '🌔';
+    if (credits > 3) return '🌓';
+    if (credits > 0) return '🌒';
+    return '🌑';
+  });
 }

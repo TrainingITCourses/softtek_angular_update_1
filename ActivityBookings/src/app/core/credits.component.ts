@@ -3,7 +3,6 @@ import {
   Component,
   ModelSignal,
   WritableSignal,
-  computed,
   model,
   signal,
 } from '@angular/core';
@@ -12,18 +11,12 @@ import {
   selector: 'lab-credits',
   standalone: true,
   template: `
-    <span (click)="openDialog.set(true)">{{ moons() }}</span>
-    <dialog [open]="openDialog()">
-      <article>
-        <header>
-          <button aria-label="Close" rel="prev" (click)="openDialog.set(false)"></button>
-          <p>Set your {{ moons() }} credit</p>
-        </header>
-        <form>
-          <input type="number" [value]="credits()" (input)="onInput($event)" />
-        </form>
-      </article>
-    </dialog>
+    <form>
+      <fieldset class="grid">
+        <label for="credit">Set your credit </label>
+        <input type="number" name="credit" [value]="credits()" (input)="onInput($event)" />
+      </fieldset>
+    </form>
   `,
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,16 +27,6 @@ export class CreditsComponent {
 
   /** Private signals for local state */
   openDialog: WritableSignal<boolean> = signal(false);
-
-  /** Computed signals for presentation */
-  moons = computed(() => {
-    const credits = this.credits();
-    if (credits > 9) return '🌕';
-    if (credits > 6) return '🌔';
-    if (credits > 3) return '🌓';
-    if (credits > 0) return '🌒';
-    return '🌑';
-  });
 
   onInput(event: Event) {
     const target = event.target as HTMLInputElement;

@@ -65,7 +65,6 @@ export class FooterWidget {
 
   userStatus: WritableSignal<UserStatus> = signal<UserStatus>({
     cookies: 'pending',
-    isAnonymous: true,
     credit: this.userCredits(),
   });
 
