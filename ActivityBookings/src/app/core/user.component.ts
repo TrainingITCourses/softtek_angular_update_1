@@ -15,6 +15,7 @@ import { UserStatus } from './user-status.type';
   template: `
     <span>🍪 {{ cookies() }}</span>
     <span>👤 {{ auth() }}</span>
+    <span>💲 {{ user().credit }}</span>
   `,
 })
 export class UserComponent {

@@ -53,21 +53,21 @@ export class FooterWidget {
   );
 
   /**
+   * Related state
+   * (for demo purposes, should be a part of userStatus)
+   */
+
+  userCredits: WritableSignal<number> = signal(0);
+
+  /**
    * Main state as a writable signal
    */
 
   userStatus: WritableSignal<UserStatus> = signal<UserStatus>({
     cookies: 'pending',
     isAnonymous: true,
-    credit: 0,
+    credit: this.userCredits(),
   });
-
-  /**
-   * Related state
-   * (for demo purposes, should be a part of userStatus)
-   */
-
-  userCredits: WritableSignal<number> = signal(0);
 
   /**
    * You can compose signals as you wish

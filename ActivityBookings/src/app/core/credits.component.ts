@@ -12,12 +12,12 @@ import {
   selector: 'lab-credits',
   standalone: true,
   template: `
-    <span (click)="openDialog.set(true)">💲 {{ moons() }}</span>
+    <span (click)="openDialog.set(true)">{{ moons() }}</span>
     <dialog [open]="openDialog()">
       <article>
         <header>
           <button aria-label="Close" rel="prev" (click)="openDialog.set(false)"></button>
-          <p>💲 {{ moons() }}</p>
+          <p>Set your {{ moons() }} credit</p>
         </header>
         <form>
           <input type="number" [value]="credits()" (input)="onInput($event)" />
