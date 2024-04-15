@@ -15,7 +15,7 @@ import { UserComponent } from './user.component';
 @Component({
   selector: 'lab-footer',
   standalone: true,
-  imports: [CookiesComponent, UserComponent, CreditsComponent],
+  imports: [UserComponent, CookiesComponent, CreditsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <footer>
@@ -45,7 +45,10 @@ export class FooterWidget {
     console.log('saving cookies status', this.#cookiesStatus());
   });
   #updateUserCredits = effect(
-    () => this.userStatus.update((state) => ({ ...state, credit: this.userCredits() })),
+    () => {
+      const credit = this.userCredits(); // source
+      this.userStatus.update((state) => ({ ...state, credit })); // target
+    },
     {
       // ! Do not abuse (try to not propagate state changes)
       allowSignalWrites: true,
