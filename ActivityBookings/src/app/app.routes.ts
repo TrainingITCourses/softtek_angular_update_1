@@ -5,4 +5,12 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./routes/home.page'),
   },
+  {
+    path: 'login',
+    loadComponent: () => import('./routes/login.page'),
+  },
+  {
+    path: ':id',
+    loadComponent: () => import('./routes/activity.page'),
+  },
 ];
