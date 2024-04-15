@@ -1,9 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ModelSignal,
+  InputSignal,
   OutputEmitterRef,
-  model,
+  input,
   output,
 } from '@angular/core';
 
@@ -35,13 +35,16 @@ export type Acceptance = 'essentials' | 'all';
   `,
 })
 export class CookiesComponent {
+  /** Output event, with signal-like syntax */
   cancel: OutputEmitterRef<void> = output();
+  /** Output event with argument, with signal-like syntax */
   accept: OutputEmitterRef<Acceptance> = output<Acceptance>();
 
-  openDialog: ModelSignal<boolean> = model(false);
+  /** Input (not required) signal mus have an initial state*/
+  openDialog: InputSignal<boolean> = input(false);
 
   onButtonsClick(acceptance?: Acceptance) {
-    this.openDialog.set(false);
+    // Events are emitted
     if (acceptance) this.accept.emit(acceptance);
     else this.cancel.emit();
   }

@@ -1,14 +1,27 @@
-import { ChangeDetectionStrategy, Component, ModelSignal, model } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ModelSignal,
+  WritableSignal,
+  computed,
+  model,
+  signal,
+} from '@angular/core';
 
 @Component({
   selector: 'lab-credits',
   standalone: true,
-  imports: [FormsModule],
   template: `
-    <dialog open>
+    <span (click)="openDialog.set(true)">💲 {{ moons() }}</span>
+    <dialog [open]="openDialog()">
       <article>
-        <input type="number" [(ngModel)]="credits" />
+        <header>
+          <button aria-label="Close" rel="prev" (click)="openDialog.set(false)"></button>
+          <p>💲 {{ moons() }}</p>
+        </header>
+        <form>
+          <input type="number" [value]="credits()" (input)="onInput($event)" />
+        </form>
       </article>
     </dialog>
   `,
@@ -16,6 +29,26 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreditsComponent {
-  // ToDo
-  credits: ModelSignal<number> = model(0);
+  /** Double input/output binding [(credits)]  */
+  credits: ModelSignal<number> = model.required();
+
+  /** Private signals for local state */
+  openDialog: WritableSignal<boolean> = signal(false);
+
+  /** Computed signals for presentation */
+  moons = computed(() => {
+    const credits = this.credits();
+    if (credits > 9) return '🌕';
+    if (credits > 6) return '🌔';
+    if (credits > 3) return '🌓';
+    if (credits > 0) return '🌒';
+    return '🌑';
+  });
+
+  onInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    // model signals propagate changes to parent like an output does
+    this.credits.set(+value);
+  }
 }
