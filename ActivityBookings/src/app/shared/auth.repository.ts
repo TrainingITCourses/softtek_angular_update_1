@@ -12,4 +12,7 @@ export class AuthRepository {
   postLogin$(credentials: any) {
     return this.#http.post<any>(`${this.#url}/login`, credentials);
   }
+  postRegister$(credentials: any) {
+    return this.#http.post<any>(`${this.#url}/register`, credentials);
+  }
 }

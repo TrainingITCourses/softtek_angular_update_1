@@ -23,6 +23,7 @@ import { AuthRepository } from '../shared/auth.repository';
             🏠 <a routerLink="/">{{ title | uppercase }}</a>
           </li>
           <li>👤 <a routerLink="/login">Login</a></li>
+          <li>👤 <a routerLink="/register">Register</a></li>
         </ul>
       </nav>
     </header>

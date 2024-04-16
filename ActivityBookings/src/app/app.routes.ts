@@ -10,6 +10,10 @@ export const routes: Routes = [
     loadComponent: () => import('./routes/login.page'),
   },
   {
+    path: 'register',
+    loadComponent: () => import('./routes/register.page'),
+  },
+  {
     path: ':id',
     loadComponent: () => import('./routes/activity.page'),
   },
