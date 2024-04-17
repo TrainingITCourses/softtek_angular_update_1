@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { Observable, catchError, of, switchMap } from 'rxjs';
 import { ActivitiesRepository } from '../shared/activities.repository';
 
@@ -30,6 +31,7 @@ import { ActivitiesRepository } from '../shared/activities.repository';
         <div>🕸️ No data yet</div>
       }
     }
+    <pre>{{ activityResolved | json }}</pre>
   `,
 })
 export default class ActivityPage {
@@ -71,6 +73,10 @@ export default class ActivityPage {
       }),
     );
   activityToSignal = toSignal(this.id$.pipe(switchMap(this.getActivity$)));
+
+  // * 4️⃣ - from router resolver
+  #route = inject(ActivatedRoute);
+  activityResolved = this.#route.snapshot.data['activityResolved'];
 
   /** Error signal */
   errorMessage: WritableSignal<string | undefined> = signal(undefined);
