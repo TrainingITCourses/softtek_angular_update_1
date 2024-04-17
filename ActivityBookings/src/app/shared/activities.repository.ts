@@ -14,7 +14,6 @@ export class ActivitiesRepository {
   }
 
   getById$(id: string) {
-    console.log('id:' + id + ';');
     return this.#http.get<any>(`${this.#url}/${id}`);
   }
 }

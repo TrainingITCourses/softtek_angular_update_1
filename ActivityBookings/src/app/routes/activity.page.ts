@@ -1,28 +1,52 @@
 import { AsyncPipe, JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Signal, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Signal,
+  WritableSignal,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { Observable, switchMap } from 'rxjs';
+import { Observable, catchError, of, switchMap } from 'rxjs';
 import { ActivitiesRepository } from '../shared/activities.repository';
 
 @Component({
   selector: 'lab-activity',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [JsonPipe, AsyncPipe],
   template: `
     <h2>Activity Id: {{ id() }}</h2>
-    <!-- <pre> {{ activityComputed() | async | json }}</pre> -->
-    <!-- <pre> {{ activityEffect() | json }}</pre> -->
-    <pre> {{ activityToSignal() | json }}</pre>
+    <!-- <pre> 1️⃣ {{ activityComputed() | async | json }}</pre> -->
+    <!-- <pre> 2️⃣ {{ activityEffect() | json }}</pre> -->
+    @if (activityToSignal(); as activity) {
+      <pre> {{ activity | json }}</pre>
+    } @else {
+      @if (errorMessage()) {
+        <div>🔥{{ errorMessage() }}</div>
+      } @else {
+        <div>🕸️ No data yet</div>
+      }
+    }
   `,
-  styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ActivityPage {
   #activitiesService = inject(ActivitiesRepository);
+  // ? required?
+  // ? resolver?
   id: Signal<string> = input<string>('');
+
+  // * 0️⃣ - toSignal does not work because this.id() got with initial values
+  //activity: Signal<any> = toSignal(this.#activitiesService.getById$(this.id()));
+
+  // * 1️⃣ - computed observable
   // activityComputed: Signal<Observable<any>> = computed(() =>
   //   this.#activitiesService.getById$(this.id()),
   // );
+
+  // * 2️⃣ - effect changing state
   // activityEffect: WritableSignal<any> = signal<any>(null);
   // #loadActivity = effect(
   //   () => {
@@ -34,9 +58,20 @@ export default class ActivityPage {
   //     allowSignalWrites: true,
   //   },
   // );
-  //activity: Signal<any> = toSignal(this.#activitiesService.getById$(this.id()));
+
+  // * 3️⃣ - toObservable toSignal
+  // source observable
   id$: Observable<string> = toObservable(this.id);
-  activityToSignal = toSignal(
-    toObservable(this.id).pipe(switchMap((id) => this.#activitiesService.getById$(id))),
-  );
+  // target observable
+  getActivity$ = (id: string) =>
+    this.#activitiesService.getById$(id).pipe(
+      catchError((error) => {
+        this.errorMessage.set(error.message);
+        return of(undefined);
+      }),
+    );
+  activityToSignal = toSignal(this.id$.pipe(switchMap(this.getActivity$)));
+
+  /** Error signal */
+  errorMessage: WritableSignal<string | undefined> = signal(undefined);
 }

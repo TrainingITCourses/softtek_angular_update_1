@@ -39,6 +39,7 @@ export class FooterWidget {
    * preferred over constructor
    * - reveal intention with name
    * - can be manual destroyed
+   * - can be private
    **/
 
   #saveCookiesStatus = effect(() => {

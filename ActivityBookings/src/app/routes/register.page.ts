@@ -8,7 +8,12 @@ import { AuthRepository } from '../shared/auth.repository';
   imports: [JsonPipe],
   template: `
     <button (click)="onRegisterClick()">Register</button>
-    <pre>{{ response() | json }}</pre>
+    @if (response()) {
+      <pre>✅ {{ response() | json }}</pre>
+    }
+    @if (error()) {
+      <pre>🔥 {{ error() | json }}</pre>
+    }
   `,
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,6 +25,7 @@ export default class RegisterPage {
     password: '1234',
   };
   response = signal<any>(null);
+  error = signal<any>('');
 
   // ToDo: Algo que dispare el observable a partir de un evento de usuario...
   //responseToSignal = toSignal(this.#authRepository.postLogin$(this.credentials));

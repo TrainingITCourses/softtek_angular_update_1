@@ -9,12 +9,13 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { ActivitiesRepository } from '../shared/activities.repository';
 
 @Component({
   selector: 'lab-home',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
   template: `
     <article>
@@ -28,42 +29,61 @@ import { ActivitiesRepository } from '../shared/activities.repository';
             <span>📌 {{ activity.location }} </span>
           </div>
         } @empty {
-          <div>no data yet</div>
+          @if (errorMessage()) {
+            <div>🔥{{ errorMessage() }}</div>
+          } @else {
+            <div>🕸️ No data yet</div>
+          }
         }
       </main>
       <footer>
-        @if (errorMessage()) {
-          <small>{{ errorMessage() }}</small>
-        }
         Got <mark>{{ activitiesCount() }}</mark> activities
       </footer>
     </article>
   `,
-  styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class HomePage {
-  #activitiesService = inject(ActivitiesRepository);
-  activities: Signal<any[]> = toSignal(
-    this.#activitiesService.getAll$().pipe(
-      catchError((e) => {
-        this.errorMessage.set(e);
-        return throwError(() => new Error('Error fetching data'));
-      }),
-    ),
-    { initialValue: [] },
+  #activitiesRepository = inject(ActivitiesRepository);
+  /** Observable with error handling to be used with | async or with toSignal() */
+  activities$: Observable<any[]> = this.#activitiesRepository.getAll$().pipe(
+    catchError((error) => {
+      // this.errorMessage = error;
+      this.errorMessage.set(error.message);
+      return of([]);
+    }),
   );
-  activitiesCount: Signal<number> = computed(() => this.activities().length);
-  errorMessage: WritableSignal<string> = signal('No error');
-  // activities: any[] = [];
-  // activities$ = this.#http.get<any[]>(this.#url);
-  // activities: WritableSignal<any[]> = signal<any[]>([]);
 
+  // * 1️⃣ - classic imperative
+  // activities: any[] = [];
   // constructor() {
-  // this.#activitiesService.getAll$().subscribe({
-  //   next: (datos) => (this.activities = datos),
-  //   error: (error) => (this.errorMessage = error),
-  // });
-  //this.#http.get<any[]>(this.#url).subscribe((datos) => this.activities.set(datos));
+  //   this.#activitiesRepository.getAll$().subscribe({
+  //     next: (body) => (this.activities = body),
+  //     error: (error) => (this.errorMessage = error),
+  //   });
   // }
+  // @for (activity of activities; track activity.id) {
+  // @if (errorMessage) {
+  //   <small>{{ errorMessage }}</small>
+  // }
+
+  // * 2️⃣ - classic reactive with | async
+  // @for (activity of (activities$ | async); track activity.id) {
+
+  // * 3️⃣ - signal imperative
+  // activities: WritableSignal<any[]> = signal([]);
+  // constructor() {
+  //   this.#activitiesRepository.getAll$().subscribe({
+  //     next: (body) => (this.activities.set(body)),
+  //     error: (error) => (this.errorMessage.set(error)),
+  //   });
+  // }
+  // @for (activity of activities(); track activity.id) {
+
+  // * 4️⃣ - signal reactive
+  activities: Signal<any[]> = toSignal(this.activities$, { initialValue: [] });
+
+  /** Counter Computed signal */
+  activitiesCount: Signal<number> = computed(() => this.activities().length);
+  /** Error signal */
+  errorMessage: WritableSignal<string | undefined> = signal(undefined);
 }

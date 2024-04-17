@@ -1,5 +1,7 @@
 import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Subject, catchError, of, switchMap } from 'rxjs';
 import { AuthRepository } from '../shared/auth.repository';
 
 @Component({
@@ -7,11 +9,19 @@ import { AuthRepository } from '../shared/auth.repository';
   standalone: true,
   imports: [JsonPipe],
   template: `
-    <button (click)="onLoginClick()">Login</button>
-    <pre>{{ response() | json }}</pre>
+    <!-- <button (click)="onLoginClick()">Login</button> -->
+    <button (click)="loginButtonClick$.next()">Login</button>
+
+    @if (error()) {
+      <pre>🔥 {{ error() | json }}</pre>
+    } @else {
+      @if (response()) {
+        <pre>✅ {{ response() | json }}</pre>
+      }
+    }
   `,
   styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export default class LoginPage {
   #authRepository: AuthRepository = inject(AuthRepository);
@@ -19,12 +29,35 @@ export default class LoginPage {
     email: 'user@fake.com',
     password: '1234',
   };
-  response = signal<any>(null);
+  //error = signal<any>('none');
+  error = computed(() => this.response()?.error);
+  //response: Signal<any> | WritableSignal<any> = signal<any>(null);
 
   // ToDo: Algo que dispare el observable a partir de un evento de usuario...
-  //responseToSignal = toSignal(this.#authRepository.postLogin$(this.credentials));
+  loginButtonClick$ = new Subject<void>();
+  response = toSignal(
+    this.loginButtonClick$.pipe(
+      switchMap(() =>
+        this.#authRepository.postLogin$(this.credentials).pipe(
+          catchError((error) => {
+            // ! do not update the template
+            // this.error.set(error);
+            // throw error;
+            return of({ error });
+          }),
+        ),
+      ),
+    ),
+    {
+      initialValue: null,
+    },
+  );
 
   onLoginClick() {
-    this.#authRepository.postLogin$(this.credentials).subscribe((res) => this.response.set(res));
+    // * 1️⃣ listener imperative
+    // this.#authRepository.postLogin$(this.credentials).subscribe({
+    //   next: (response) => this.response.set(response),
+    //   error: (error) => this.error.set(error),
+    // });
   }
 }
