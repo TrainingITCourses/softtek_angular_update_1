@@ -26,7 +26,7 @@ export default class RegisterPage {
 
   #redirectOnLogin = effect(() => {
     if (this.response().result) {
-      this.#router.navigate(['']);
+      // this.#router.navigate(['']);
     }
   });
 

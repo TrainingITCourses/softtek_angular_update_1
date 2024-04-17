@@ -39,7 +39,7 @@ export default class LoginPage {
 
   #redirectOnLogin = effect(() => {
     if (this.result()) {
-      this.#router.navigate(['']);
+      // this.#router.navigate(['']);
     }
   });
 

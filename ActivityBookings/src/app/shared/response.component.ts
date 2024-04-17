@@ -19,6 +19,6 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 })
 export class ResponseComponent {
   response = input<any>();
-  error = computed(() => this.response()?.error);
+  error = computed(() => this.response()?.error?.message);
   result = computed(() => this.response()?.result);
 }

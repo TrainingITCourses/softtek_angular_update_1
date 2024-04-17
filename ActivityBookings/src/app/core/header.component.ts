@@ -2,7 +2,7 @@ import { UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { AuthRepository } from '../shared/auth.repository';
+import { AuthStore } from '../shared/auth.store';
 
 // class FakeAuthService {
 //   user = 'fake!!!';
@@ -22,14 +22,17 @@ import { AuthRepository } from '../shared/auth.repository';
           <li>
             🏠 <a routerLink="/">{{ title | uppercase }}</a>
           </li>
-          <li>👤 <a routerLink="/login">Login</a></li>
-          <li>👤 <a routerLink="/register">Register</a></li>
+          @if (isAnonymous()) {
+            <li>👤 <a routerLink="/login">Login</a></li>
+            <li>👤 <a routerLink="/register">Register</a></li>
+          }
         </ul>
       </nav>
     </header>
   `,
 })
 export class HeaderComponent {
-  #authRepository: AuthRepository = inject(AuthRepository);
+  #authStore = inject(AuthStore);
+  isAnonymous = this.#authStore.isAnonymous;
   title: string = environment.appName;
 }
